@@ -8,7 +8,7 @@ library(ggplot2)
 library(tidyverse)
 library(knitr)
 
-raw_data <- read_csv("/Users/nikhilakalapatapu/Creative Data Visualization Project/Perfumes_dataset.csv")
+raw_data <- read_csv("Perfumes_dataset.csv")
 colnames(raw_data)
 unique(raw_data$category)
 unique(raw_data$target_audience)
