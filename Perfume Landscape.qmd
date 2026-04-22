@@ -1,0 +1,83 @@
+---
+title: "Perfume Landscape"
+format: html
+---
+library(dplyr)
+library(ggplot2)
+library(tidyverse)
+
+```{r}
+raw_data <- read_csv("/Users/nikhilakalapatapu/Creative Data Visualization Project/Perfumes_dataset.csv")
+colnames(raw_data)
+unique(raw_data$category)
+unique(raw_data$target_audience)
+unique(raw_data$longevity)
+```
+
+```{r}
+
+transformed_data <- raw_data %>%
+  mutate(
+    fresh    = grepl("fresh|citrus|aquatic|green", category, ignore.case = TRUE),
+    floral   = grepl("floral|rose", category, ignore.case = TRUE),
+    fruity   = grepl("fruity|tropical|cherry|apple", category, ignore.case = TRUE),
+    woody    = grepl("woody|sandalwood", category, ignore.case = TRUE),
+    spicy    = grepl("spicy|pepper", category, ignore.case = TRUE),
+    oriental = grepl("oriental|amber", category, ignore.case = TRUE),
+    gourmand = grepl("gourmand|vanilla|sweet|dessert|chocolate", category, ignore.case = TRUE),
+    oud      = grepl("oud|oudh", category, ignore.case = TRUE),
+    dark     = grepl("leather|smoky|tobacco|incense", category, ignore.case = TRUE),
+    aromatic = grepl("aromatic|fougere|chypre|musky", category, ignore.case = TRUE),
+
+  longevity_score = case_when(
+    grepl("Light", longevity, ignore.case = TRUE) ~ 1,
+    grepl("Medium", longevity, ignore.case = TRUE) ~ 2,
+    grepl("Strong", longevity, ignore.case = TRUE) ~ 3
+  ),
+  
+  audience_score = case_when(
+    grepl("Female|Women", target_audience, ignore.case = TRUE) ~ 1,
+    grepl("Unisex", target_audience, ignore.case = TRUE) ~ 2,
+    grepl("Male|Men", target_audience, ignore.case = TRUE) ~ 3
+  ),
+
+    scent_score = 
+      fresh * 1 +
+      floral * 2 +
+      fruity * 3 +
+      gourmand * 4 +
+      woody * 5 +
+      oriental * 6 +
+      spicy * 7 +
+      oud * 8 +
+      dark * 9 +
+      aromatic * 10,
+
+    count = fresh + floral + fruity + woody + spicy + oriental + gourmand + oud + dark + aromatic,
+    scent_score = ifelse(count == 0, NA, scent_score / count), 
+  ) %>%
+  filter(!is.na(scent_score), !is.na(longevity_score))
+
+transformed_data$audience_score
+
+
+```
+
+```{r}
+ggplot(transformed_data, aes(x = scent_score, y = longevity_score)) +
+  stat_density_2d(
+    aes(fill = after_stat(density)),
+    geom = "raster",
+    contour = FALSE
+  ) +
+  scale_fill_viridis_c(option = "plasma")
+
+ggplot(transformed_data, aes(x = scent_score, y = audience_score)) +
+  stat_density_2d(
+    aes(fill = after_stat(density)),
+    geom = "raster",
+    contour = FALSE
+  ) +
+  scale_fill_viridis_c(option = "viridis")
+```
+
