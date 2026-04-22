@@ -2,11 +2,12 @@
 title: "Perfume Landscape"
 format: html
 ---
+```{r setup, include=FALSE}
 library(dplyr)
 library(ggplot2)
 library(tidyverse)
+library(knitr)
 
-```{r}
 raw_data <- read_csv("/Users/nikhilakalapatapu/Creative Data Visualization Project/Perfumes_dataset.csv")
 colnames(raw_data)
 unique(raw_data$category)
@@ -57,9 +58,6 @@ transformed_data <- raw_data %>%
     scent_score = ifelse(count == 0, NA, scent_score / count), 
   ) %>%
   filter(!is.na(scent_score), !is.na(longevity_score))
-
-transformed_data$audience_score
-
 
 ```
 
