@@ -2,6 +2,7 @@
 title: "Perfume Landscape"
 format: html
 ---
+For this assignment I decided to work with a dataset about perfumes. I downloaded the dataset from Kaggle and took a look at the columns. The columns are brand, perfume (the name of the perfume), type (whether it is an Eau de Toilette or Eau de Perfume), category (it's scent family), target audience (Male, Female, or Unisex), and longevitiy (Light, Medium, Strong). I thought it would be interesting to create a "perfume landscape", where perfumes are categorized into various scent families and plotted in relation to their target audience and longevity. 
 ```{r setup, include=FALSE}
 library(dplyr)
 library(ggplot2)
@@ -15,6 +16,10 @@ unique(raw_data$target_audience)
 unique(raw_data$longevity)
 ```
 
+I first created 10 new columns for each of the perfumes in a new dataset, which each column being an overarching category based on the scent families in the original dataset. Let's say a perfume was originally categorized as `Fresh floral`. It would receive a value of `1` in the `fresh` column, a value of `1` in the `floral` column, and a `0` for all other columns. I then computed a composite scent score for each perfume and stored that in the `scent_score` column. So the composite scent score for the perfume in the `Fresh floral` would be `[(1*1)+(1*2)+(0*3)+(0*4)+(0*5)+(0*6)+(0*7)+(0*8)
++(0*9)+(0*10)]/(1+1+0+0+0+0+0+0+0+0) = 1.5`.
+
+I also assigned numeric values to perfumes based on their longetivity and who they are marketed towards. 
 ```{r}
 
 transformed_data <- raw_data %>%
@@ -57,10 +62,11 @@ transformed_data <- raw_data %>%
     count = fresh + floral + fruity + woody + spicy + oriental + gourmand + oud + dark + aromatic,
     scent_score = ifelse(count == 0, NA, scent_score / count), 
   ) %>%
-  filter(!is.na(scent_score), !is.na(longevity_score))
+  filter(!is.na(scent_score), !is.na(longevity_score), !is.na(audience_score))
 
 ```
 
+I used the `stat_density_2d` function in `ggplot2` to visualize the concentration of data points in a scatterplot. I created two plots, to understand the relationship between the scent family that a perfume belongs to and how long it lasts and who its marketed towards. I think these plots can be interpreted as "landscapes" or pieces of visual art. 
 ```{r}
 ggplot(transformed_data, aes(x = scent_score, y = longevity_score)) +
   stat_density_2d(

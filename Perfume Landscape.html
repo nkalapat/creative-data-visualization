@@ -99,6 +99,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<p>For this assignment I decided to work with a dataset about perfumes. I downloaded the dataset from Kaggle and took a look at the columns. The columns are brand, perfume (the name of the perfume), type (whether it is an Eau de Toilette or Eau de Perfume), category (it’s scent family), target audience (Male, Female, or Unisex), and longevitiy (Light, Medium, Strong). I thought it would be interesting to create a “perfume landscape”, where perfumes are categorized into various scent families and plotted in relation to their target audience and longevity.</p>
+<p>I first created 10 new columns for each of the perfumes in a new dataset, which each column being an overarching category based on the scent families in the original dataset. Let’s say a perfume was originally categorized as <code>Fresh floral</code>. It would receive a value of <code>1</code> in the <code>fresh</code> column, a value of <code>1</code> in the <code>floral</code> column, and a <code>0</code> for all other columns. I then computed a composite scent score for each perfume and stored that in the <code>scent_score</code> column. So the composite scent score for the perfume in the <code>Fresh floral</code> would be <code>[(1*1)+(1*2)+(0*3)+(0*4)+(0*5)+(0*6)+(0*7)+(0*8) +(0*9)+(0*10)]/(1+1+0+0+0+0+0+0+0+0) = 1.5</code>.</p>
+<p>I also assigned numeric values to perfumes based on their longetivity and who they are marketed towards.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>transformed_data <span class="ot">&lt;-</span> raw_data <span class="sc">%&gt;%</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
@@ -140,8 +143,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">count =</span> fresh <span class="sc">+</span> floral <span class="sc">+</span> fruity <span class="sc">+</span> woody <span class="sc">+</span> spicy <span class="sc">+</span> oriental <span class="sc">+</span> gourmand <span class="sc">+</span> oud <span class="sc">+</span> dark <span class="sc">+</span> aromatic,</span>
 <span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">scent_score =</span> <span class="fu">ifelse</span>(count <span class="sc">==</span> <span class="dv">0</span>, <span class="cn">NA</span>, scent_score <span class="sc">/</span> count), </span>
 <span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(scent_score), <span class="sc">!</span><span class="fu">is.na</span>(longevity_score))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(scent_score), <span class="sc">!</span><span class="fu">is.na</span>(longevity_score), <span class="sc">!</span><span class="fu">is.na</span>(audience_score))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<p>I used the <code>stat_density_2d</code> function in <code>ggplot2</code> to visualize the concentration of data points in a scatterplot. I created two plots, to understand the relationship between the scent family that a perfume belongs to and how long it lasts and who its marketed towards. I think these plots can be interpreted as “landscapes” or pieces of visual art.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(transformed_data, <span class="fu">aes</span>(<span class="at">x =</span> scent_score, <span class="at">y =</span> longevity_score)) <span class="sc">+</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_density_2d</span>(</span>
@@ -164,10 +168,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">contour =</span> <span class="cn">FALSE</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_c</span>(<span class="at">option =</span> <span class="st">"viridis"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 1 row containing non-finite outside the scale range
-(`stat_density2d()`).</code></pre>
-</div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
